@@ -26,6 +26,7 @@ function Hide-Console
 Hide-Console
 
 $Time = New-ScheduledTaskTrigger -AtLogOn
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries
 
 #Creates trigger for any user device unlock
 $stateChangeTrigger = Get-CimClass -Namespace root\Microsoft\Windows\TaskScheduler -ClassName MSFT_TaskSessionStateChangeTrigger
@@ -54,7 +55,8 @@ try {
 
         $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ex bypass -file `"$ScriptLocation`""
         $STPrin = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Users" -RunLevel Highest
-        Register-ScheduledTask -TaskName $ScheduledTaskName -Trigger $Time,$onUnlockTrigger -Action $Action -Force -Principal $STPrin
+        Register-ScheduledTask -TaskName $ScheduledTaskName -Trigger $Time,$onUnlockTrigger -Action $Action -Force -Principal $STPrin -Settings $settings
+        #Register-ScheduledTask -TaskName $ScheduledTaskName -Trigger $Time,$onUnlockTrigger -User $ScheduledTaskUser -Action $Action -Force -Principal $STPrin
 
     }
     else {
